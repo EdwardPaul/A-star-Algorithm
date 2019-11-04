@@ -24,7 +24,7 @@ bool Map::IsObstacle(int row, int col)
 
 bool Map::IsValid(int row, int col)
 {
-    return (row>=0) && (row<height) && (col<width);
+    return (row>=0) && (row<height) && (col<width) && (col>=0);
 }
 
 void Map::getMap(const char *FileName)
@@ -277,15 +277,18 @@ void Map::getMap(const char *FileName)
             }
         }
     }
+
     //some additional checks
     if (!hasGrid) {
         std::cout << "Error! There is no tag 'grid' in xml-file!\n";
     }
 
+
     if (Grid[start_i][start_j] != CN_GC_NOOBS) {
         std::cout << "Error! Start cell is not traversable (cell's value is" << Grid[start_i][start_j] << ")!"
                   << std::endl;
     }
+
 
     if (Grid[goal_i][goal_j] != CN_GC_NOOBS) {
         std::cout << "Error! Goal cell is not traversable (cell's value is" << Grid[goal_i][goal_j] << ")!"
@@ -303,5 +306,3 @@ int Map::getValue(int i, int j) const
 
     return Grid[i][j];
 }
-
-

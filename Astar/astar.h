@@ -41,7 +41,7 @@ public:
 
     SearchResult Astar(Map &map, const char*);
 
-
+    int count;
 };
 
 #endif // ASTAR_H

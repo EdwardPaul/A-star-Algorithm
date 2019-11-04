@@ -5,11 +5,7 @@ TARGET = Astar
 CONFIG += console
 CONFIG -= app_bundle
 CONFIG += C++11
-QMAKE_CXXFLAGS += -std=c++11 -O2 -Wall -Wextra
-
-win32 {
-QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++
-}
+QMAKE_CXXFLAGS += -std=c++11
 
 TEMPLATE = app
 
@@ -18,17 +14,19 @@ SOURCES += main.cpp \
     map.cpp \
     tinyxml2.cpp \
     xmllogger.cpp \
-    config.cpp
+    config.cpp \
+    options.cpp
 
 HEADERS += \
     astar.h \
     map.h \
     struct.h \
-    heuristics.h \
     configuration.h \
     const.h \
     tinyxml2.h \
     xmllogger.h \
     config.h \
-    ilogger.h
+    ilogger.h \
+    options.h \
+    heuristics.h
 

@@ -72,7 +72,6 @@ void Search::Path(Node curr, Map &map, const char* FileName)
 
 
 
-
     cout << "OpenSize: " << open.size() << endl;
     cout << "Total number of steрs: " << result.TotalSteps << endl;
     cout << "Total number of nodes: " << result.NodesNum << endl;
