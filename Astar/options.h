@@ -6,9 +6,8 @@ class Options
 private:
 
 public:
-    Options();
-    Options(bool, bool, bool, double, int);
-    ~Options();
+    Options(){}
+    ~Options(){}
 
 
     bool allowdiagonal;

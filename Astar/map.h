@@ -19,7 +19,7 @@ class Map
 private:
     int **Grid;
 public:
-    Map(const char*);
+    Map();
     ~Map();
     bool IsValid(int, int);
     bool IsObstacle(int, int);
@@ -30,6 +30,7 @@ public:
     int height;
     int start_i, start_j, goal_i, goal_j;
     double cellSize;
+    const char* filename;
 
 
 };

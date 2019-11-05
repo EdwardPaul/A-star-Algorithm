@@ -3,25 +3,28 @@
 
 Search::Search()
 {
-}
-
-Search::Search(Map &map, const char* FileName)
-{
-    result.length = 0;
     result.FoundPath = false;
     count = 0;
+}
 
+Search::~Search()
+{
+}
+
+void Search::get_input(Map &map)
+{
     start.x = map.start_i;
     start.y = map.start_j;
     goal.x = map.goal_i;
     goal.y = map.goal_j;
 
-    config.getConfig(FileName);
-    options = Options(config.SearchParams[CN_SP_AD], config.SearchParams[CN_SP_CC], config.SearchParams[CN_SP_AS], config.SearchParams[CN_SP_HW], config.SearchParams[CN_SP_MT]);
+    config.getConfig(map.filename);
+    options.allowdiagonal = config.SearchParams[CN_SP_AD];
+    options.cutcorners = config.SearchParams[CN_SP_CC];
+    options.allowsqueeze = config.SearchParams[CN_SP_AS];
+    options.hweight = config.SearchParams[CN_SP_HW];
+    options.metrictype = config.SearchParams[CN_SP_MT];
 }
-
-Search::~Search()
-{}
 
 double Search::Hfunc(Node curr, Node fin)
 {
@@ -40,10 +43,9 @@ double Search::Hfunc(Node curr, Node fin)
     }
 }
 
-void Search::Path(Node curr, Map &map, const char* FileName)
+void Search::Path(Node curr, Map &map)
 {
     AgentConfiguration path;
-    result.length = 0;
     while(curr.parent)
     {
         path.x = curr.i;
@@ -54,38 +56,13 @@ void Search::Path(Node curr, Map &map, const char* FileName)
 
     result.track.push_front(start);
 
-    list <AgentConfiguration> :: iterator itl = result.track.begin();
-
-    while (itl!=prev(result.track.end()))
-    {
-        if (itl->x - next(itl)->x == 0 || itl->y - next(itl)->y == 0)
-        {
-            result.length = result.length + 1.0;
-        }
-        else
-        {
-            result.length = result.length + CN_SQRT_TWO;
-        }
-
-        itl++;
-    }
-
-
 
     cout << "OpenSize: " << open.size() << endl;
     cout << "Total number of steрs: " << result.TotalSteps << endl;
     cout << "Total number of nodes: " << result.NodesNum << endl;
     cout << "length: " << result.length << endl;
-    cout << "Time: " << result.Time << endl;
     cout << count << endl;
 
-
-    logger = new XmlLogger;
-    logger->getLog(FileName, config.LogParams);
-    logger->writeToLogSummary(result, map.cellSize);
-    logger->writeToLogMap(map, result.track);
-    logger->writeToLogPath(result.track);
-    logger->saveLog();
 }
 
 
@@ -147,9 +124,13 @@ list<Node> Search::findSuccessors(Node curr, Node fin, Map &map)
     return successors;
 }
 
-SearchResult Search::Astar(Map &map, const char* FileName)
+SearchResult Search::Astar(Map &map)
 {
-    result.Time = time(NULL);
+
+    get_input(map);
+
+    std::chrono::time_point<std::chrono::system_clock> start_sec, end_sec;
+    start_sec = std::chrono::system_clock::now();
     Node curr;
     Node fin;
     fin.i = goal.x;
@@ -170,23 +151,25 @@ SearchResult Search::Astar(Map &map, const char* FileName)
 
 
         std::map<int, Node>::iterator it = open.begin();
-        while (it != open.end())
+        for (;it != open.end(); it++)
         {
-            if (it->second.f <= min.f)
+            if (it->second.f > min.f)
             {
-                if (it->second.f == min.f)
-                {
-                    if (it->second.g < min.g)
-                    {
-                        min = it->second;
-                    }
-                }
-                else
-                {
-                    min = it->second;
-                }
+                continue;
             }
-            it++;
+            if (it->second.f == min.f)
+            {
+                if (it->second.g >= min.g)
+                {
+                    continue;
+                }
+
+                min = it->second;
+            }
+            else
+            {
+                min = it->second;
+            }
         }
         curr = min;
         close.insert({curr.i*map.height + curr.j, curr});
@@ -197,8 +180,8 @@ SearchResult Search::Astar(Map &map, const char* FileName)
             result.FoundPath = true;
             result.TotalSteps = close.size();
             result.NodesNum = open.size() + close.size();
-            result.Time = time(NULL) - result.Time;
-            Path(curr, map, FileName);
+            result.length = curr.g;
+            Path(curr, map);
             break;
         }
 
@@ -206,41 +189,40 @@ SearchResult Search::Astar(Map &map, const char* FileName)
         list <Node> successors = findSuccessors(curr, fin, map);
         list <Node> :: iterator it2 = successors.begin();
 
-        while (it2!=successors.end())
+        for (;it2 != successors.end();++it2)
         {
             Node temp = *it2;
 
             std::map<int, Node>::iterator it_open = open.find(temp.i * map.height + temp.j);
             Node o = it_open->second;
 
-            if (close.find(temp.i * map.height + temp.j)==close.end())
+            if (close.find(temp.i * map.height + temp.j)!=close.end())
             {
-                if (it_open==open.end())
-                {
-
-                    temp.parent = &(close.find(curr.i*map.height + curr.j)->second);
-                    open.insert({temp.i * map.height + temp.j, temp});
-                }
-
-                else
-                {
-                    if (temp.g < o.g)
-                    {
-                        open.erase(temp.i * map.height + temp.j);
-                        o.g = temp.g;
-                        o.f = o.g + options.hweight * o.h;
-                        o.parent = &(close.find(curr.i*map.height + curr.j)->second);
-                        open.insert({temp.i * map.height + temp.j, o});
-                        count++;
-                    }
-
-                }
-
+                continue;
             }
 
-            it2++;
-        }
+            if (it_open==open.end())
+            {
 
+                temp.parent = &(close.find(curr.i*map.height + curr.j)->second);
+                open.insert({temp.i * map.height + temp.j, temp});
+            }
+
+            else
+            {
+                if (temp.g >= o.g)
+                {
+                    continue;
+                }
+
+                open.erase(temp.i * map.height + temp.j);
+                o.g = temp.g;
+                o.f = o.g + options.hweight * o.h;
+                o.parent = &(close.find(curr.i*map.height + curr.j)->second);
+                open.insert({temp.i * map.height + temp.j, o});
+                count++;
+            }
+        }
 
     }
 
@@ -249,6 +231,14 @@ SearchResult Search::Astar(Map &map, const char* FileName)
         cout<< "Not found" <<endl;
     }
 
+    end_sec = std::chrono::system_clock::now();
+    result.Time = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(end_sec - start_sec).count()) / 1000000000;
+
+    logger.getLog(map.filename, config.LogParams);
+    logger.writeToLogSummary(result, map.cellSize);
+    logger.writeToLogMap(map, result.track);
+    logger.writeToLogPath(result.track);
+    logger.saveLog();
 
     return result;
 

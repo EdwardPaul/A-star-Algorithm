@@ -14,8 +14,7 @@ SOURCES += main.cpp \
     map.cpp \
     tinyxml2.cpp \
     xmllogger.cpp \
-    config.cpp \
-    options.cpp
+    config.cpp
 
 HEADERS += \
     astar.h \
@@ -26,7 +25,5 @@ HEADERS += \
     tinyxml2.h \
     xmllogger.h \
     config.h \
-    ilogger.h \
-    options.h \
-    heuristics.h
+    options.h
 

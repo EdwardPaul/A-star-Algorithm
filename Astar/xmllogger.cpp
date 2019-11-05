@@ -8,8 +8,6 @@ XmlLogger::XmlLogger()
 
 bool XmlLogger::getLog(const char *FileName, const std::string *LogParams)
 {
-    if (loglevel == CN_LP_LEVEL_NOPE_WORD) return true;
-
     if (doc.LoadFile(FileName) != tinyxml2::XMLError::XML_SUCCESS) {
         std::cout << "Error opening input XML file" << std::endl;
         return false;
@@ -63,37 +61,30 @@ bool XmlLogger::getLog(const char *FileName, const std::string *LogParams)
 
     root = (root->LastChild())->ToElement();
 
-    if (loglevel != CN_LP_LEVEL_NOPE_WORD) {
-        log = doc.NewElement(CNS_TAG_MAPFN);
-        log->LinkEndChild(doc.NewText(FileName));
-        root->InsertEndChild(log);
+    log = doc.NewElement(CNS_TAG_MAPFN);
+    log->LinkEndChild(doc.NewText(FileName));
+    root->InsertEndChild(log);
 
-        root->InsertEndChild(doc.NewElement(CNS_TAG_SUM));
+    root->InsertEndChild(doc.NewElement(CNS_TAG_SUM));
 
-        root->InsertEndChild(doc.NewElement(CNS_TAG_PATH));
+    root->InsertEndChild(doc.NewElement(CNS_TAG_PATH));
 
-        root->InsertEndChild(doc.NewElement(CNS_TAG_LPLEVEL));
+    root->InsertEndChild(doc.NewElement(CNS_TAG_LPLEVEL));
 
-        root->InsertEndChild(doc.NewElement(CNS_TAG_HPLEVEL));
-    }
+    root->InsertEndChild(doc.NewElement(CNS_TAG_HPLEVEL));
 
-    if (loglevel == CN_LP_LEVEL_FULL_WORD || loglevel == CN_LP_LEVEL_MEDIUM_WORD)
-        root->InsertEndChild(doc.NewElement(CNS_TAG_LOWLEVEL));
+
 
     return true;
 }
 
 void XmlLogger::saveLog()
 {
-    if (loglevel == CN_LP_LEVEL_NOPE_WORD)
-        return;
     doc.SaveFile(LogFileName.c_str());
 }
 
 void XmlLogger::writeToLogMap(const Map &map, const std::list<AgentConfiguration> &path)
 {
-    if (loglevel == CN_LP_LEVEL_NOPE_WORD || loglevel == CN_LP_LEVEL_TINY_WORD)
-        return;
 
     XMLElement *mapTag = doc.FirstChildElement(CNS_TAG_ROOT);
     mapTag = mapTag->FirstChildElement(CNS_TAG_LOG)->FirstChildElement(CNS_TAG_PATH);
@@ -129,8 +120,7 @@ void XmlLogger::writeToLogMap(const Map &map, const std::list<AgentConfiguration
 
 void XmlLogger::writeToLogPath(const std::list<AgentConfiguration> &path)
 {
-    if (loglevel == CN_LP_LEVEL_NOPE_WORD || loglevel == CN_LP_LEVEL_TINY_WORD || path.empty())
-        return;
+
     int iterate = 0;
     XMLElement *lplevel = doc.FirstChildElement(CNS_TAG_ROOT);
     lplevel = lplevel->FirstChildElement(CNS_TAG_LOG)->FirstChildElement(CNS_TAG_LPLEVEL);
@@ -149,8 +139,6 @@ void XmlLogger::writeToLogPath(const std::list<AgentConfiguration> &path)
 
 void XmlLogger::writeToLogSummary(SearchResult result, double cellSize)
 {
-    if (loglevel == CN_LP_LEVEL_NOPE_WORD)
-        return;
 
     XMLElement *summary = doc.FirstChildElement(CNS_TAG_ROOT);
     summary = summary->FirstChildElement(CNS_TAG_LOG)->FirstChildElement(CNS_TAG_SUM);
@@ -165,9 +153,6 @@ void XmlLogger::writeToLogSummary(SearchResult result, double cellSize)
 
 void XmlLogger::writeToLogNotFound()
 {
-    if (loglevel == CN_LP_LEVEL_NOPE_WORD)
-        return;
-
     XMLElement *node = doc.FirstChildElement(CNS_TAG_ROOT)->FirstChildElement(CNS_TAG_LOG)->FirstChildElement(CNS_TAG_PATH);
     node->InsertEndChild(doc.NewText("Path NOT found!"));
 }

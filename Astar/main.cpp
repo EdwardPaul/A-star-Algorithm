@@ -3,9 +3,15 @@
 
 int main(int argc, char* argv[])
 {
-    Map map1(argv[1]);
+    if (argc < 2)
+    {
+        return 0;
+    }
+
+    Map map1;
+    map1.getMap(argv[1]);
 
 
-    Search search(map1, argv[1]);
-    search.Astar(map1, argv[1]);
+    Search search;
+    search.Astar(map1);
 }

@@ -7,6 +7,7 @@
 #include <math.h>
 #include <limits.h>
 #include <algorithm>
+#include <chrono>
 
 #include "struct.h"
 #include "map.h"
@@ -28,18 +29,18 @@ private:
     AgentConfiguration goal;
 
     double Hfunc(Node, Node);
-    void Path(Node, Map &map, const char*);
+    void Path(Node, Map &map);
     list<Node> findSuccessors(Node, Node, Map &map);
     Config                  config;
-    XmlLogger* logger;
+    XmlLogger logger;
     Options options;
 
 public:
     Search();
-    Search(Map&, const char*);
     ~Search();
+    void get_input(Map&);
 
-    SearchResult Astar(Map &map, const char*);
+    SearchResult Astar(Map &map);
 
     int count;
 };

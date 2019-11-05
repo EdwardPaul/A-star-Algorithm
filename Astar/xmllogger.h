@@ -6,17 +6,15 @@
 #include <map>
 #include <unordered_map>
 #include "config.h"
-#include "ilogger.h"
 
-class XmlLogger:public ILogger
+class XmlLogger
 {
 private:
     std::string LogFileName;
     tinyxml2::XMLDocument doc;
 public:
     XmlLogger();
-    XmlLogger(std::string loglevel):ILogger(loglevel){}
-    virtual ~XmlLogger() {};
+    ~XmlLogger() {}
     bool getLog(const char *FileName, const std::string *LogParams);
     void saveLog();
     void writeToLogMap(const Map &Map, const std::list<AgentConfiguration> &path);

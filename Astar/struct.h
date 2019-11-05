@@ -2,7 +2,6 @@
 #define STRUCT_H
 
 #include <list>
-#include <time.h>
 
 #include "configuration.h"
 
@@ -27,7 +26,7 @@ struct SearchResult
     float length;
     bool FoundPath;
     std::list <AgentConfiguration> track;
-    time_t Time;
+    double Time;
 
 };
 

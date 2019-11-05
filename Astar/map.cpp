@@ -1,17 +1,18 @@
 #include "map.h"
 
-Map::Map(const char *FileName)
+Map::Map()
 {
-    getMap(FileName);
-
 }
 
 Map::~Map()
 {
-    height = -1;
-    width = -1;
-    Grid = nullptr;
-    cellSize = 1;
+
+    for (int i = 0; i < width; ++i)
+    {
+        delete[] Grid[i];
+    }
+
+    delete[] Grid;
 
 }
 
@@ -30,6 +31,7 @@ bool Map::IsValid(int row, int col)
 void Map::getMap(const char *FileName)
 {
 
+    filename = FileName;
     int grid_i = 0, grid_j = 0;
 
     tinyxml2::XMLElement *root = 0, *map = 0, *element = 0, *mapnode;
