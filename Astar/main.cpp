@@ -13,5 +13,6 @@ int main(int argc, char* argv[])
 
 
     Search search;
+    //search.get_input(map1);
     search.Astar(map1);
 }

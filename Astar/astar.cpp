@@ -26,6 +26,7 @@ void Search::get_input(Map &map)
     options.metrictype = config.SearchParams[CN_SP_MT];
 }
 
+
 double Search::Hfunc(Node curr, Node fin)
 {
     switch (options.metrictype)
@@ -42,6 +43,7 @@ double Search::Hfunc(Node curr, Node fin)
         return 0;
     }
 }
+
 
 void Search::Path(Node curr, Map &map)
 {
@@ -150,7 +152,7 @@ SearchResult Search::Astar(Map &map)
         min.f = LONG_MAX;
 
 
-        std::map<int, Node>::iterator it = open.begin();
+        std::unordered_map<int, Node>::iterator it = open.begin();
         for (;it != open.end(); it++)
         {
             if (it->second.f > min.f)
@@ -193,8 +195,8 @@ SearchResult Search::Astar(Map &map)
         {
             Node temp = *it2;
 
-            std::map<int, Node>::iterator it_open = open.find(temp.i * map.height + temp.j);
-            Node o = it_open->second;
+            unordered_map<int, Node>::iterator it_open = open.find(temp.i * map.height + temp.j);
+            Node* o = &(it_open->second);
 
             if (close.find(temp.i * map.height + temp.j)!=close.end())
             {
@@ -210,16 +212,16 @@ SearchResult Search::Astar(Map &map)
 
             else
             {
-                if (temp.g >= o.g)
+                if (temp.g >= o->g)
                 {
                     continue;
                 }
 
                 open.erase(temp.i * map.height + temp.j);
-                o.g = temp.g;
-                o.f = o.g + options.hweight * o.h;
-                o.parent = &(close.find(curr.i*map.height + curr.j)->second);
-                open.insert({temp.i * map.height + temp.j, o});
+                o->g = temp.g;
+                o->f = o->g + options.hweight * o->h;
+                o->parent = &(close.find(curr.i*map.height + curr.j)->second);
+                open.insert({temp.i * map.height + temp.j, *o});
                 count++;
             }
         }
@@ -241,5 +243,7 @@ SearchResult Search::Astar(Map &map)
     logger.saveLog();
 
     return result;
+    return result;
 
 }
+

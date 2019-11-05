@@ -2,7 +2,7 @@
 #define ASTAR_H
 
 #include <iostream>
-#include <map>
+//#include <map>
 #include <unordered_map>
 #include <math.h>
 #include <limits.h>
@@ -22,7 +22,7 @@ using namespace std;
 class Search
 {
 private:
-    map <int, Node> open;
+    unordered_map <int, Node> open;
     unordered_map <int, Node> close;
     SearchResult result;
     AgentConfiguration start;
